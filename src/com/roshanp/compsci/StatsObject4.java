@@ -4,18 +4,23 @@ import java.util.ArrayList;
 
 public class StatsObject4 {
     private int[] frequencies = new int[128];
+    private ArrayList<Character> statsObject = new ArrayList<>();
     int topN;
 
-    public int[] getFrequencies() {
-        return this.frequencies;
-    }
-
     public StatsObject4(int topN) {
+        this.topN = topN;
+    }
+    public StatsObject4(String str, int topN) {
+        char[] toChar = str.toCharArray();
+        for (int i = 0; i < toChar.length; i++) {
+            add(toChar[i]);
+        }
         this.topN = topN;
     }
 
     public void add(char chr) {
         frequencies[(int) (chr)]++;
+        statsObject.add(chr);
     }
 
     public void addAllLetters(String str) {
@@ -33,13 +38,13 @@ public class StatsObject4 {
         int size = 0;
         for (int i = 0; i < frequencies.length; i++) {
             if (frequencies[i] != 0) {
-                size++;
+                size += frequencies[i];
             }
         }
         return size;
     }
 
-    public int getNumUnique() {
+    public int getUniqueCharCount() {
         int unique = 0;
         for (int i = 0; i < frequencies.length; i++) {
             if (frequencies[i] != 0) {
@@ -50,39 +55,29 @@ public class StatsObject4 {
     }
 
     public char getMostFrequent() {
-        char mostFrequent = 'b'; //replaceable
+        int mostFrequent = 1; //replaceable
         for (int i = 0; i < frequencies.length; i++) {
-            if (frequencies[i] > frequencies[(int) (mostFrequent)]) {
-                mostFrequent = (char) (i);
+            if (frequencies[i] > frequencies[mostFrequent]) {
+                mostFrequent = i;
             }
         }
-        return mostFrequent;
+        return (char) mostFrequent;
     }
 
-    public ArrayList<Character> getTopMostFrequent() {
-        StatsObject4 copy = new StatsObject4(0);
-        copy.frequencies = this.frequencies;
-
-        ArrayList<Character> output = new ArrayList<>();
-
+    public char[] getTopMostFrequent() {
+        char[] topNMostFrequnt = new char[topN];
+        int[] frequenciesCopy = frequencies.clone();
         for (int i = 0; i < topN; i++) {
-            output.add(copy.getMostFrequent());
-            copy.remove(copy.getMostFrequent());
-        }
-        return output;
-    }
-
-    public static void sort(int[] arr) {
-        int countSwitch = 1;
-        while (countSwitch > 0) {
-            countSwitch = 0;
-            for (int i = 0; i < arr.length - 1; i++) {
-                if (arr[i] > arr[i + 1]) {
-                    swapIndexes(arr, i, i + 1);
-                    countSwitch++;
+            int mostFrequent = 0;
+            for (int j = 0; j < frequenciesCopy.length; j++) {
+                if (frequenciesCopy[j] > frequenciesCopy[mostFrequent]) {
+                    mostFrequent = j;
                 }
             }
+            topNMostFrequnt[i] = (char) mostFrequent;
+            frequenciesCopy[mostFrequent] = 0;
         }
+        return topNMostFrequnt;
     }
 
     private static void swapIndexes(int[] arr, int a, int b) {
