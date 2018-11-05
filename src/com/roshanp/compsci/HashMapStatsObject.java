@@ -2,58 +2,65 @@ package com.roshanp.compsci;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class HashMapStatsObject {
-    private Map<Character, ArrayList<Integer>> statsObject = new LinkedHashMap<>();
+    private Map<Character, ArrayList<Integer>> statsObject = new HashMap<>();
+    private ArrayList<Character> mostFrequentAsList = new ArrayList<>();
     private Character mostFrequent;
     private int size = 0;
     private int topN;
 
     public HashMapStatsObject(String str, int topN) {
+        this.topN = topN;
         char[] strToChar = str.toCharArray();
         for (int i = 0; i < strToChar.length; i++) {
             this.add(strToChar[i]);
         }
-        this.topN = topN;
     }
 
     public void add(Character chr) {
         size++;
         if (size == 1) {
             mostFrequent = chr;
+            mostFrequentAsList.add(chr);
         }
         if (!statsObject.containsKey(chr)) {
             statsObject.put(chr, new ArrayList<>());
         }
         statsObject.get(chr).add(size - 1);
-    }
 
-    //Get topN most frequent
-    public ArrayList<Character> getTopMostFrequent() {
-        Map<Character, ArrayList<Integer>> copy = new HashMap<>(statsObject);
-        ArrayList<Character> topMostFrequent = new ArrayList<>();
-        Character mostFrequent;
-
-        //constant because topN is a constant;
-        for (int i = 0; i < topN; i++) {
-            mostFrequent = getMostFrequentForList(copy);
-            copy.remove(mostFrequent);
-            topMostFrequent.add(mostFrequent);
+        if (statsObject.get(chr).size() > statsObject.get(mostFrequent).size()) {
+            mostFrequent = chr;
         }
-        return topMostFrequent;
+
+        updateMostFrequentAsList(chr);
     }
 
-    private Character getMostFrequentForList(Map<Character, ArrayList<Integer>> copy) {
-        Character mostFrequentInList = (Character) copy.keySet().toArray()[0];
-        //constant because loops size number of times; size is a constant
-        for (Character key : copy.keySet()) {
-            if (copy.get(key).size() > copy.get(mostFrequentInList).size()) {
-                mostFrequentInList = key;
+    private void updateMostFrequentAsList(Character chr) {
+        if (mostFrequentAsList.contains(chr)) {
+            mostFrequentAsList.remove(chr);
+        }
+
+        int indexToInsert = getInsertionIndex(chr);
+        mostFrequentAsList.add(indexToInsert, chr);
+
+        if (mostFrequentAsList.size() > topN) {
+            mostFrequentAsList.remove(mostFrequentAsList.size() - 1);
+        }
+    }
+
+    private int getInsertionIndex(Character chr) {
+        for (int i = 0; i < mostFrequentAsList.size() - 1; i++) {
+            if (getCountOf(chr) > getCountOf(mostFrequentAsList.get(i))) {
+                return i;
             }
         }
-        return mostFrequentInList;
+        return mostFrequentAsList.size();
+    }
+
+    public ArrayList<Character> getTopMostFrequent() {
+        return this.mostFrequentAsList;
     }
 
     public Character getMostFrequent() {
@@ -74,7 +81,7 @@ public class HashMapStatsObject {
 
     public Character getRandom() {
         String object = this.reconstruct();
-        int index = (int) (Math.random()*object.length());
+        int index = (int) (Math.random() * object.length());
         return object.charAt(index);
     }
 
