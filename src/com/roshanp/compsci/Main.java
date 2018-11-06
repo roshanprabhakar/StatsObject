@@ -10,6 +10,7 @@ public class Main {
         print(statsObject.getUniqueCount());
         print(statsObject.size());
         print(statsObject.reconstruct());
+        print(statsObject.getRandom());
     }
 
     //HELPER
